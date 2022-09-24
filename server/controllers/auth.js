@@ -41,11 +41,9 @@ export const signin = async (req, res, next) => {
     const cookieOption = {
       httpOnly: true,
     };
-    res.cookie('access_token', token, cookieOption).status(200).json({
-      name: user.name,
-      email: user.email,
-    });
-    
+
+    const { _password, ...otherUserDetail } = user._doc;
+    res.cookie('access_token', token, cookieOption).status(200).json(otherUserDetail);
   } catch (error) {
     next(error);
   }
