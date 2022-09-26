@@ -1,13 +1,11 @@
-import User from '../models/User.js';
-import bcrypt from 'bcryptjs';
-import { createError } from '../error.js';
-import jwt from 'jsonwebtoken';
+import User from "../models/User.js";
+import { createError } from "../error.js";
+import jwt from "jsonwebtoken";
+import { hashPassword } from "../encryption.js";
 
 export const signup = async (req, res, next) => {
-  var salt = await bcrypt.genSalt(10);
-
   try {
-    const hashedPassword = await bcrypt.hash(req.body.password, salt);
+    const hashedPassword = await hashPassword(req.body.password);
     const newUser = new User({
       ...req.body,
       password: hashedPassword,
@@ -30,10 +28,10 @@ export const signin = async (req, res, next) => {
       email,
     });
 
-    if (!user) return next(createError(404, 'User not found'));
+    if (!user) return next(createError(404, "User not found"));
 
     const isPasswordMatch = await bcrypt.compare(password, user.password);
-    if (!isPasswordMatch) return next(createError(400, 'Invalid credential!'));
+    if (!isPasswordMatch) return next(createError(400, "Invalid credential!"));
     const payload = {
       id: user._id,
     };
@@ -43,7 +41,10 @@ export const signin = async (req, res, next) => {
     };
 
     const { _password, ...otherUserDetail } = user._doc;
-    res.cookie('access_token', token, cookieOption).status(200).json(otherUserDetail);
+    res
+      .cookie("access_token", token, cookieOption)
+      .status(200)
+      .json(otherUserDetail);
   } catch (error) {
     next(error);
   }
@@ -51,6 +52,6 @@ export const signin = async (req, res, next) => {
 
 export const googleSignin = (req, res) => {
   res.json({
-    message: 'Successfull',
+    message: "Successfull",
   });
 };
