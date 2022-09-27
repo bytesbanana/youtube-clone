@@ -1,7 +1,7 @@
 import User from "../models/User.js";
 import { createError } from "../error.js";
 import jwt from "jsonwebtoken";
-import { hashPassword } from "../encryption.js";
+import { hashPassword, comparePassword } from "../encryption.js";
 
 export const signup = async (req, res, next) => {
   try {
@@ -30,7 +30,7 @@ export const signin = async (req, res, next) => {
 
     if (!user) return next(createError(404, "User not found"));
 
-    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    const isPasswordMatch = await comparePassword(password, user.password);
     if (!isPasswordMatch) return next(createError(400, "Invalid credential!"));
     const payload = {
       id: user._id,
