@@ -55,16 +55,15 @@ export const getUser = async (req, res, next) => {
 };
 
 export const subscribe = async (req, res, next) => {
+  console.log("subscribe channel");
   try {
-    await User.findById(req.user.id, {
+    await User.findByIdAndUpdate(req.user.id, {
       $push: { subscribedUsers: req.params.id },
-    });
-
-    await User.findByIdAndUpdate(req.params.id, {
       $inc: {
         subscribers: 1,
       },
     });
+
     res.status(200).json("Subscription successfull");
   } catch (err) {
     next(err);
